@@ -428,12 +428,12 @@ function changeColorOfPlant(plant) {
   {
     let estate4 = createEstate();
     console.log("* Empty Estate");
-    let emptyGallons = calculateWaterUsagePerWeek(estate4);
+    let emptyGallons = Math.floor(calculateWaterUsagePerWeek(estate4));
     console.log(emptyGallons === 0);
 
     console.log("* Calculate Whole Estate is equal to 12.");
     estate4 = createdPopulatedEstate();
-    let totalGallons = calculateWaterUsagePerWeek(estate4);
+    let totalGallons = Math.floor(calculateWaterUsagePerWeek(estate4));
     console.log(totalGallons === 12);
   }
 
