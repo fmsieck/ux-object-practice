@@ -85,17 +85,21 @@ class Estate {
     }
     return numGallons;
   }
-  cloneAllTheRosesAndChangeTheirColors() {
+  cloneAllTheRoses() {
     let clonedRoses = [];
-    for (let rose of this.roseArbor.listOfPlants) {
-      let clonedRose = rose.clone();
-      clonedRoses.push(clonedRose);
+    for (let originalRose of this.roseArbor.listOfPlants) {
+      if (originalRose.isFlawed) {
+        clonedRoses.push(cloneRose(originalRose));
+      } else {
+        clonedRoses.push(originalRose);
+      }
     }
-    this.roseArbor.listOfPlants = this.roseArbor.listOfPlants.concat(
-      clonedRoses
-    );
+    for (let originalRose of clonedRoses) {
+      this.roseArbor.listOfPlants.push(originalRose);
+    }
   }
 }
+
 let rose = new Plant(
   "rose",
   true,
@@ -122,7 +126,7 @@ let roseGroup = [rose, anotherRose];
 let estate = new Estate();
 estate.addPlant(rose);
 estate.addPlant(anotherRose);
-estate.cloneAllTheRosesAndChangeTheirColors();
+estate.cloneAllTheRoses();
 console.log(estate);
 // let roseArbor = new Garden("Rose Arbor", roseGroup);
 
@@ -130,3 +134,48 @@ console.log(estate);
 // console.log(rose.cloneBlackRose());
 // console.log(roseArbor.describe());
 // console.log(estate.calculateWaterUsagePerWeek());
+
+let myEstate = new Estate();
+
+let firstPlant = new Plant(
+  "rose",
+  true,
+  "rounded with a point",
+  "green",
+  "red",
+  "concentric circles of pedals",
+  0.8,
+  4
+);
+myEstate.addPlant(firstPlant);
+
+let secondPlant = new Plant(
+  "orchid",
+  true,
+  "long and wide with a point at the end",
+  "green",
+  "fuscia",
+  "pedals surrounding a central mouth",
+  1.2,
+  2
+);
+myEstate.addPlant(secondPlant);
+
+let thirdPlant = new Plant(
+  "marigold",
+  false,
+  "thin and jagged along branches",
+  "green",
+  "yellow and orange",
+  "rounded pedals in groups of five with a darker orange center",
+  0.8,
+  4
+);
+myEstate.addPlant(thirdPlant);
+
+myEstate.describe(); // This should print the whole description of the estate.
+
+myEstate.calculateWaterUsagePerWeek(); // This should print 2.8
+
+myEstate.cloneAllTheRoses(); // This should clone the rose and make a second one.
+console.log(myEstate.roseArbor.listOfPlants.length == 2);

@@ -209,12 +209,13 @@ function cloneRose(plant) {
   let clone = {};
   // Your Code Here!
   for (let itemValue in plant) {
-    clone[itemValue] = plant[itemValue];
+    if (plant.hasOwnProperty(itemValue)) {
+      clone[itemValue] = plant[itemValue];
+    }
   }
   // Given a plant, clone it and return the new plant
   // Hint: You do this in the Reading!  copyObject...
 
-  changeColorOfPlant(clone);
   return clone;
 }
 
@@ -279,5 +280,301 @@ function changeColorOfPlant(plant) {
   let randomChance = Math.floor(Math.random() * 3);
   if (randomChance < 1) {
     plant.isFlawed = true;
+  }
+}
+/**
+ * cloneAllTheRoses
+ * @param {Object} estate - An estate object
+ *
+ * This should attempt to clone every rose and add the plant to the garden.
+ * Just watch out for flawed plants!  Don't attempt to clone flawed plants.
+ * Otherwise you will produce flowerless roses.
+ */
+function cloneAllTheRoses(estate) {
+  let newRose = [];
+  for (let originalRose of estate.roseArbor) {
+    if (originalRose.isFlawed) {
+      newRose.push(cloneRose(originalRose));
+    } else {
+      newRose.push(originalRose);
+    }
+  }
+  for (let originalRose of newRose) {
+    estate.roseArbor.push(originalRose);
+  }
+}
+// for each rose...
+// Hint: Watch out for modifying an array you are currently looping through!  How can you avoid that?
+// Instead of putting the new plants immediately into the rose arbor, maybe store them in a new array
+// until you have finished iterating.  Then you can add them in after your loop finishes.
+/* 
+   -------TESTS---------------------------------------------------------------
+   Run these commands to make sure you did it right. They should all be true.
+*/
+{
+  console.log("-----Tests for Exercise One-----");
+  {
+    let plantProperties = getAllTestPlants()[0];
+    console.log("* Get a rose");
+    let plant1 = createPlant(...plantProperties); // this is called a "spread" operator, it takes every value in the array and passes each into the function as a parameter
+    let hasEveryProperty = true;
+    if (plant1) {
+      let values1 = Object.values(plant1);
+      for (let property of plantProperties) {
+        if (!values1.includes(property)) {
+          hasEveryProperty = false;
+          console.log(`ERROR - The plant is missing a value: ${property}`);
+        }
+      }
+    }
+    console.log(plant1 && hasEveryProperty);
+  }
+  console.log("-----Tests for Exercise Two-----");
+  {
+    let plants2 = getAllTestPlants();
+    let estate2 = createEstate();
+    console.log("* Add a rose");
+    let rose2 = createPlant(...plants2[0]);
+    addPlantToEstate(estate2, rose2);
+    console.log(
+      estate2.roseArbor.length === 1 &&
+        estate2.perennialGarden.length === 0 &&
+        estate2.slopePlanters.length === 0 &&
+        estate2.roseArbor[0] === rose2
+    );
+    console.log("* Add another rose");
+    addPlantToEstate(estate2, rose2);
+    console.log(
+      estate2.roseArbor.length === 2 &&
+        estate2.perennialGarden.length === 0 &&
+        estate2.slopePlanters.length === 0 &&
+        estate2.roseArbor[1] === rose2
+    );
+    console.log("* Add a perrenial");
+    let orchid2 = createPlant(...plants2[1]);
+    addPlantToEstate(estate2, orchid2);
+    console.log(
+      estate2.roseArbor.length === 2 &&
+        estate2.perennialGarden.length === 1 &&
+        estate2.slopePlanters.length == 0 &&
+        estate2.perennialGarden[0] === orchid2
+    );
+    console.log("* Add a high sun perrenial");
+    let lavender2 = createPlant(...plants2[3]);
+    addPlantToEstate(estate2, lavender2);
+    console.log(
+      estate2.roseArbor.length === 2 &&
+        estate2.perennialGarden.length === 1 &&
+        estate2.slopePlanters.length == 1 &&
+        estate2.slopePlanters[0] === lavender2
+    );
+    console.log("* Add a non-perrenial");
+    let marigold2 = createPlant(...plants2[7]);
+    addPlantToEstate(estate2, marigold2);
+    console.log(
+      estate2.roseArbor.length === 2 &&
+        estate2.perennialGarden.length === 1 &&
+        estate2.slopePlanters.length == 2 &&
+        estate2.slopePlanters[1] === marigold2
+    );
+  }
+  console.log("-----Tests for Exercise Three-----");
+  {
+    let estate3 = createdPopulatedEstate();
+    console.log("* describePlant works and includes the flower color");
+    let plantDescription3 = describePlant(estate3.roseArbor[0]);
+    console.log(plantDescription3);
+    console.log(
+      plantDescription3 &&
+        plantDescription3.length > 0 &&
+        plantDescription3.indexOf(estate3.roseArbor[0].flowerColor) > -1
+    );
+    console.log("* describeGarden works and includes the flower color");
+    let gardenDescription3 = describeGarden("Rose Arbor", estate3.roseArbor);
+    console.log(gardenDescription3);
+    console.log(
+      gardenDescription3 &&
+        gardenDescription3.length > 0 &&
+        gardenDescription3.indexOf(estate3.roseArbor[0].flowerColor) > -1
+    );
+    console.log("* describeEstate works");
+    let estateDescription3 = describeEstate(estate3);
+    console.log(estateDescription3);
+    console.log(
+      estateDescription3 &&
+        estateDescription3.length > 0 &&
+        estateDescription3.indexOf(estate3.roseArbor[0].flowerColor) > -1
+    );
+  }
+  console.log("-----Tests for Exercise Four-----");
+  {
+    let estate4 = createEstate();
+    console.log("* Empty Estate");
+    let emptyGallons = calculateWaterUsagePerWeek(estate4);
+    console.log(emptyGallons === 0);
+    console.log("* Calculate Whole Estate is equal to 12.");
+    estate4 = createdPopulatedEstate();
+    let totalGallons = calculateWaterUsagePerWeek(estate4);
+    console.log(totalGallons === 12);
+  }
+  console.log("-----Tests for Exercise Five-----");
+  {
+    let estate5 = createdPopulatedEstate();
+    console.log("* Clone Rose");
+    let rose5 = estate5.roseArbor[0];
+    let rose5Copy = cloneRose(rose5);
+    console.log(
+      !!rose5Copy &&
+        !!rose5Copy.type &&
+        rose5Copy.type === rose5.type &&
+        rose5Copy.isPerennial === rose5.isPerennial &&
+        rose5Copy.leafDescription === rose5.leafDescription &&
+        rose5Copy.leafColor === rose5.leafColor &&
+        rose5Copy.flowerColor === rose5.flowerColor &&
+        rose5Copy.flowerDescription === rose5.flowerDescription &&
+        rose5Copy.gallonsWaterPerWeek === rose5.gallonsWaterPerWeek &&
+        rose5Copy.amountOfSunNeeded === rose5.amountOfSunNeeded
+    );
+    console.log("* Clone All Roses - First Run");
+    let initialNumRoses = estate5.roseArbor.length;
+    cloneAllTheRoses(estate5);
+    console.log(
+      estate5.roseArbor.length > 0 &&
+        estate5.roseArbor.length === initialNumRoses * 2
+    );
+    console.log("* Clone All Roses - After a few runs... - No flawed roses.");
+    cloneAllTheRoses(estate5);
+    cloneAllTheRoses(estate5);
+    cloneAllTheRoses(estate5);
+    let hasNoRuinedRoses = true;
+    for (let rose of estate5.roseArbor) {
+      if (rose.flowerColor == null) {
+        hasNoRuinedRoses = false;
+      }
+    }
+    console.log(
+      estate5.roseArbor.length > 0 &&
+        estate5.roseArbor.length > initialNumRoses &&
+        hasNoRuinedRoses
+    );
+  }
+  /*
+       -------TEST UTILITIES------------------------------------------------------
+       These are utilities for the tests.
+       Do not modify anything below this line.
+       But read through these and try to understand what they  do.
+    */
+  function createdPopulatedEstate() {
+    let estate = createEstate();
+    let plants = getAllTestPlants();
+    for (let plant of plants) {
+      let plantObj = createPlant(...plant);
+      addPlantToEstate(estate, plantObj);
+    }
+    return estate;
+  }
+  function getAllTestPlants() {
+    return [
+      [
+        "rose",
+        true,
+        "rounded with a point",
+        "green",
+        "red",
+        "concentric circles of pedals",
+        0.8,
+        4,
+      ],
+      [
+        "orchid",
+        true,
+        "long and wide with a point at the end",
+        "green",
+        "fuscia",
+        "pedals surrounding a central mouth",
+        1.2,
+        2,
+      ],
+      [
+        "lily",
+        true,
+        "small and rounded",
+        "green",
+        "pink, white, blue, or orange",
+        "brightly colored pedals surrounding a lighter center",
+        2,
+        4,
+      ],
+      [
+        "lavender",
+        true,
+        "long and skinny",
+        "green",
+        "purple",
+        "fragrant rod-like clusters of many tiny pedals",
+        2.5,
+        8,
+      ],
+      [
+        "poppy",
+        true,
+        "long and jagged at the base of the plant",
+        "green",
+        "orange or red",
+        "concentric circles of ruffled pedals surrounding a central core",
+        0.8,
+        4,
+      ],
+      [
+        "begonia",
+        false,
+        "large with jagged edges and visible veins",
+        "purple and green",
+        "pink",
+        "a few gently ruffled pedals with a central cluster of yellow pistils",
+        1.8,
+        5,
+      ],
+      [
+        "snapdragon",
+        false,
+        "long and skinny along the entire stem",
+        "green",
+        "red, yellow, or orange",
+        "many groups of ruffled pedals all along the stem",
+        0.5,
+        4,
+      ],
+      [
+        "marigold",
+        false,
+        "thin and jagged along branches",
+        "green",
+        "yellow and orange",
+        "rounded pedals in groups of five with a darker orange center",
+        0.8,
+        4,
+      ],
+      [
+        "rose",
+        true,
+        "rounded with a point",
+        "green",
+        "purple",
+        "concentric circles of pedals",
+        0.8,
+        4,
+      ],
+      [
+        "rose",
+        true,
+        "rounded with a point",
+        "green",
+        "blue",
+        "concentric circles of pedals",
+        0.8,
+        4,
+      ],
+    ];
   }
 }
