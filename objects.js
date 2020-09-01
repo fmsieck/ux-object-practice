@@ -28,16 +28,6 @@
 
     Remember to Save the file before you click Run Code!
 */
-
-/* ---------------------------------------------------------------------------
-    Exercise One
-
-    Creating a plant
-
-    In order to keep track of your plants, you need to store them in your program.
-    Complete the createPlant() function, which returns an object representing a plant.
-    It should include all of the properties listed in the comment above the function.
-*/
 /**
  * createPlant - Produces an object respresenting a plant.  It should have the following properties:
  * @param {string} type - The Type of plant.  Possible values are [ "rose", "orchid", "lily", "lavender", "poppy", "begonia", "snapdragon", "marigold"]
@@ -77,26 +67,6 @@ function createPlant(
 }
 
 createPlant("rose", true, "jagged leaves", "green", "green", "circular", 2, 7);
-
-/* ------------------------------------------------
-    Exercise Two
-
-    The owner wants you to decide where to put every new plant they get.
-
-    Each plant must go in one of the three gardens of the estate.
-
-    The createEstate() has already been written for you, which returns an object representing the entire estate.
-    The estate contains three collections of plants: 
-    the roseArbor, the perennialGarden, and the slopePlanters.
-
-    Now complete the function addPlantToEstate()
-    This should decide, based upon the plant's properties, where to put the plant in the estate.  
-
-    The rose arbor should contain all of the roses.
-    The perennial garden should contain only perennials.  However, the perennial garden doesn't get that much sun.  
-    No plants with an amountOfSunNeeded greater than 5 should be placed in the perennial garden.
-    The rest of the plants should be placed in the slope planters.
-*/
 
 function createEstate() {
   let estate = {
@@ -143,33 +113,6 @@ function addPlantToEstate(estate, plant) {
     estate.slopePlanters.push(plant);
   }
 }
-
-/* ------------------------------------------------
-    Exercise Three
-
-    The owner wants to have an easy way to hear about the plants in their garden.
-
-    So you decide to write some functions which describe the plants.
-
-    Complete the describePlant(), describePlants(), and describeGarden() functions below.
-
-    They should each return a string, which is a readible english paragraph that nicely describes
-    the visual features of the plant or a list of plants, or the entire estate.
-
-    Feel free to be as elaborate as you wish!
-
-    If you want examples of different plants, set a breakpoint and run the test. 
-    It will go through several example plants.
-    
-    Try to have as little redundent code as possible! 
-    
-    Hint: describeEstate can call describeGarden which can call describePlant
-
-    Hint2: YOu can use Template literals here to make this easy! If you have not used those yet,
-    read up on them here: https://flaviocopes.com/javascript-template-literals/  
-    `A ${plant.name} which has ....`
-    But you can just use string concatenation too   "A " + plant.name + " which has ..."
-*/
 
 /**
  * describePlant
@@ -228,15 +171,6 @@ function describeEstate(estate) {
   return description;
 }
 
-/* ---------------------------------------------------------------------------
-    Exercise Four
-
-    The owner wants you to tell them how much water the entire garden is going
-    to need per week.
-
-    Complete the calculateWaterUsagePerWeek() function.
-*/
-
 /**
  * calculateWaterUsagePerWeek
  * @param {Object} estate - An estate object
@@ -260,24 +194,6 @@ function calculateWaterUsagePerWeek(estate) {
   return Math.floor(numGallons);
 }
 
-/* ---------------------------------------------------------------------------
-    Exercise Five
-
-    Clone a plant
-
-    The botanist of the estate wants more colors of roses, so they have devised a way to
-    alter the color of a plant.
-    They want you to clone each of the roses in the garden giving them more
-    elaborate colors.
-
-    First, complete cloneRose().
-    Given a plant, this should clone it and return a copy with a new color.
-
-    Complete cloneAllTheRosesAndChangeTheirColors().  
-    This function should go attempt to clone all the roses in the garden.  
-    Make sure your algorithm does not clone or change the color of flawed plants!
-*/
-
 /**
  * cloneRose
  * @param {Object} plant - A plant object
@@ -293,12 +209,13 @@ function cloneRose(plant) {
   let clone = {};
   // Your Code Here!
   for (let itemValue in plant) {
-    clone[itemValue] = plant[itemValue];
+    if (plant.hasOwnProperty(itemValue)) {
+      clone[itemValue] = plant[itemValue];
+    }
   }
   // Given a plant, clone it and return the new plant
   // Hint: You do this in the Reading!  copyObject...
 
-  changeColorOfPlant(clone);
   return clone;
 }
 
@@ -365,8 +282,31 @@ function changeColorOfPlant(plant) {
     plant.isFlawed = true;
   }
 }
-// DO NOT CHANGE ANYTHING IN THIS
-
+/**
+ * cloneAllTheRoses
+ * @param {Object} estate - An estate object
+ *
+ * This should attempt to clone every rose and add the plant to the garden.
+ * Just watch out for flawed plants!  Don't attempt to clone flawed plants.
+ * Otherwise you will produce flowerless roses.
+ */
+function cloneAllTheRoses(estate) {
+  let newRose = [];
+  for (let originalRose of estate.roseArbor) {
+    if (originalRose.isFlawed) {
+      newRose.push(cloneRose(originalRose));
+    } else {
+      newRose.push(originalRose);
+    }
+  }
+  for (let originalRose of newRose) {
+    estate.roseArbor.push(originalRose);
+  }
+}
+// for each rose...
+// Hint: Watch out for modifying an array you are currently looping through!  How can you avoid that?
+// Instead of putting the new plants immediately into the rose arbor, maybe store them in a new array
+// until you have finished iterating.  Then you can add them in after your loop finishes.
 /* 
    -------TESTS---------------------------------------------------------------
    Run these commands to make sure you did it right. They should all be true.
@@ -377,7 +317,6 @@ function changeColorOfPlant(plant) {
     let plantProperties = getAllTestPlants()[0];
     console.log("* Get a rose");
     let plant1 = createPlant(...plantProperties); // this is called a "spread" operator, it takes every value in the array and passes each into the function as a parameter
-
     let hasEveryProperty = true;
     if (plant1) {
       let values1 = Object.values(plant1);
@@ -388,15 +327,12 @@ function changeColorOfPlant(plant) {
         }
       }
     }
-
     console.log(plant1 && hasEveryProperty);
   }
-
   console.log("-----Tests for Exercise Two-----");
   {
     let plants2 = getAllTestPlants();
     let estate2 = createEstate();
-
     console.log("* Add a rose");
     let rose2 = createPlant(...plants2[0]);
     addPlantToEstate(estate2, rose2);
@@ -406,7 +342,6 @@ function changeColorOfPlant(plant) {
         estate2.slopePlanters.length === 0 &&
         estate2.roseArbor[0] === rose2
     );
-
     console.log("* Add another rose");
     addPlantToEstate(estate2, rose2);
     console.log(
@@ -415,7 +350,6 @@ function changeColorOfPlant(plant) {
         estate2.slopePlanters.length === 0 &&
         estate2.roseArbor[1] === rose2
     );
-
     console.log("* Add a perrenial");
     let orchid2 = createPlant(...plants2[1]);
     addPlantToEstate(estate2, orchid2);
@@ -425,7 +359,6 @@ function changeColorOfPlant(plant) {
         estate2.slopePlanters.length == 0 &&
         estate2.perennialGarden[0] === orchid2
     );
-
     console.log("* Add a high sun perrenial");
     let lavender2 = createPlant(...plants2[3]);
     addPlantToEstate(estate2, lavender2);
@@ -435,7 +368,6 @@ function changeColorOfPlant(plant) {
         estate2.slopePlanters.length == 1 &&
         estate2.slopePlanters[0] === lavender2
     );
-
     console.log("* Add a non-perrenial");
     let marigold2 = createPlant(...plants2[7]);
     addPlantToEstate(estate2, marigold2);
@@ -446,7 +378,6 @@ function changeColorOfPlant(plant) {
         estate2.slopePlanters[1] === marigold2
     );
   }
-
   console.log("-----Tests for Exercise Three-----");
   {
     let estate3 = createdPopulatedEstate();
@@ -458,7 +389,6 @@ function changeColorOfPlant(plant) {
         plantDescription3.length > 0 &&
         plantDescription3.indexOf(estate3.roseArbor[0].flowerColor) > -1
     );
-
     console.log("* describeGarden works and includes the flower color");
     let gardenDescription3 = describeGarden("Rose Arbor", estate3.roseArbor);
     console.log(gardenDescription3);
@@ -467,7 +397,6 @@ function changeColorOfPlant(plant) {
         gardenDescription3.length > 0 &&
         gardenDescription3.indexOf(estate3.roseArbor[0].flowerColor) > -1
     );
-
     console.log("* describeEstate works");
     let estateDescription3 = describeEstate(estate3);
     console.log(estateDescription3);
@@ -477,24 +406,20 @@ function changeColorOfPlant(plant) {
         estateDescription3.indexOf(estate3.roseArbor[0].flowerColor) > -1
     );
   }
-
   console.log("-----Tests for Exercise Four-----");
   {
     let estate4 = createEstate();
     console.log("* Empty Estate");
-    let emptyGallons = Math.floor(calculateWaterUsagePerWeek(estate4));
+    let emptyGallons = calculateWaterUsagePerWeek(estate4);
     console.log(emptyGallons === 0);
-
     console.log("* Calculate Whole Estate is equal to 12.");
     estate4 = createdPopulatedEstate();
-    let totalGallons = Math.floor(calculateWaterUsagePerWeek(estate4));
+    let totalGallons = calculateWaterUsagePerWeek(estate4);
     console.log(totalGallons === 12);
   }
-
   console.log("-----Tests for Exercise Five-----");
   {
     let estate5 = createdPopulatedEstate();
-
     console.log("* Clone Rose");
     let rose5 = estate5.roseArbor[0];
     let rose5Copy = cloneRose(rose5);
@@ -505,23 +430,22 @@ function changeColorOfPlant(plant) {
         rose5Copy.isPerennial === rose5.isPerennial &&
         rose5Copy.leafDescription === rose5.leafDescription &&
         rose5Copy.leafColor === rose5.leafColor &&
-        rose5Copy.flowerColor !== rose5.flowerColor &&
+        rose5Copy.flowerColor === rose5.flowerColor &&
+        rose5Copy.flowerDescription === rose5.flowerDescription &&
         rose5Copy.gallonsWaterPerWeek === rose5.gallonsWaterPerWeek &&
         rose5Copy.amountOfSunNeeded === rose5.amountOfSunNeeded
     );
-
     console.log("* Clone All Roses - First Run");
     let initialNumRoses = estate5.roseArbor.length;
-    cloneAllTheRosesAndChangeTheirColors(estate5);
+    cloneAllTheRoses(estate5);
     console.log(
       estate5.roseArbor.length > 0 &&
         estate5.roseArbor.length === initialNumRoses * 2
     );
-
     console.log("* Clone All Roses - After a few runs... - No flawed roses.");
-    cloneAllTheRosesAndChangeTheirColors(estate5);
-    cloneAllTheRosesAndChangeTheirColors(estate5);
-    cloneAllTheRosesAndChangeTheirColors(estate5);
+    cloneAllTheRoses(estate5);
+    cloneAllTheRoses(estate5);
+    cloneAllTheRoses(estate5);
     let hasNoRuinedRoses = true;
     for (let rose of estate5.roseArbor) {
       if (rose.flowerColor == null) {
@@ -534,28 +458,21 @@ function changeColorOfPlant(plant) {
         hasNoRuinedRoses
     );
   }
-
   /*
        -------TEST UTILITIES------------------------------------------------------
        These are utilities for the tests.
-    
        Do not modify anything below this line.
-    
        But read through these and try to understand what they  do.
     */
-
   function createdPopulatedEstate() {
     let estate = createEstate();
     let plants = getAllTestPlants();
-
     for (let plant of plants) {
       let plantObj = createPlant(...plant);
       addPlantToEstate(estate, plantObj);
     }
-
     return estate;
   }
-
   function getAllTestPlants() {
     return [
       [
